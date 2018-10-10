@@ -9,3 +9,14 @@ C:\Users\slloyd\git\ephemeris\obj\Debug\netcoreapp2.1\ephemeris.AssemblyInfoInpu
 C:\Users\slloyd\git\ephemeris\obj\Debug\netcoreapp2.1\ephemeris.AssemblyInfo.cs
 C:\Users\slloyd\git\ephemeris\obj\Debug\netcoreapp2.1\ephemeris.dll
 C:\Users\slloyd\git\ephemeris\obj\Debug\netcoreapp2.1\ephemeris.pdb
+C:\Users\Sam\ephemeris\bin\Debug\netcoreapp2.1\ephemeris.deps.json
+C:\Users\Sam\ephemeris\bin\Debug\netcoreapp2.1\ephemeris.runtimeconfig.json
+C:\Users\Sam\ephemeris\bin\Debug\netcoreapp2.1\ephemeris.runtimeconfig.dev.json
+C:\Users\Sam\ephemeris\bin\Debug\netcoreapp2.1\ephemeris.dll
+C:\Users\Sam\ephemeris\bin\Debug\netcoreapp2.1\ephemeris.pdb
+C:\Users\Sam\ephemeris\obj\Debug\netcoreapp2.1\ephemeris.csprojAssemblyReference.cache
+C:\Users\Sam\ephemeris\obj\Debug\netcoreapp2.1\ephemeris.csproj.CoreCompileInputs.cache
+C:\Users\Sam\ephemeris\obj\Debug\netcoreapp2.1\ephemeris.AssemblyInfoInputs.cache
+C:\Users\Sam\ephemeris\obj\Debug\netcoreapp2.1\ephemeris.AssemblyInfo.cs
+C:\Users\Sam\ephemeris\obj\Debug\netcoreapp2.1\ephemeris.dll
+C:\Users\Sam\ephemeris\obj\Debug\netcoreapp2.1\ephemeris.pdb
