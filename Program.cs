@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using System.Linq;
 
 namespace ephemeris
 {
@@ -13,6 +12,7 @@ namespace ephemeris
         {
             System.Console.WriteLine(item);
         }
+        System.Console.WriteLine(now.tau(parser("0.2458400084722D+7")));
       System.Console.ReadLine();
     }
     public static double parser(string toParse)
@@ -81,11 +81,17 @@ namespace ephemeris
       return k;
     }
 
-    public double tau(double t, int n = 1)
+    public double tau(double t)
     {
-      return n * (t - this.begin) / (this.end - this.begin);
+      return 2*(t - this.begin) / (this.end - this.begin)-1;
     }
-
+    public double[] tau(double t, int n)
+    {
+        double[] k= new double[2];
+        k[0] = Math.Floor(n*tau(t));
+        k[1] = 2*(n*(1+tau(t))/2.0-k[0])-1;
+        return k;
+    }
     public static Block readFile(string t, string filename = @"ascp1950.430.txt")
     {
       int counter = 0;
