@@ -1,46 +1,59 @@
-using System;
+﻿using System;
 using System.IO;
 
 namespace ephemeris
 {
-    class Program
+  class Program
+  {
+    static void Main(string[] args) => System.Console.WriteLine("Nothing implemented yet.");
+  }
+  class Ephemeris
+  {
+    class Header
     {
-        static void Main(string[] args) => System.Console.WriteLine("Nothing implemented yet.");
+
     }
-    class Ephemeris
+    class ephFile
     {
-        class Header
+      int startYear;
+      int endYear;
+      class Block
+      {
+        class Coefficients
         {
-
+          class Chebyshev
+          {
+              private double N(int n, double x){
+                  if (-1<=x & 1>=x){
+                      return Math.Cos(n*Math.Acos(x));
+                  }
+                  else
+                  {
+                      throw new ArgumentOutOfRangeException("x");
+                  }
+              }
+          }
         }
-        class ephFile
-        {
-            int startYear;
-            int endYear;
-            class Block
-            {
-                class Coefficients
-                {
-                    class Chebyshev
-                    {
-
-                    }
-                }
-            }
-        }
-        class Body
-        {
-            string name;
-            Body relativeTo;
-            public class Position
-            {
-
-            }
-            public class Velocity
-            {
-
-            }
-        }
+      }
     }
+    class Body
+    {
+      string name;
+      public class Position
+      {
+        double x;
+        double y;
+        double z;
+        Body relativeTo;
+      }
+      public class Velocity
+      {
+        double x;
+        double y;
+        double z;
+        Body relativeTo;
+      }
+    }
+  }
 
 }

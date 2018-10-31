@@ -3294,23 +3294,23 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\slloyd\\.nuget\\packages\\": {},
+    "C:\\Users\\Sam\\.nuget\\packages\\": {},
     "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\slloyd\\git\\ephemeris\\ephemeris.csproj",
+      "projectUniqueName": "C:\\Users\\Sam\\ephemeris\\ephemeris.csproj",
       "projectName": "ephemeris",
-      "projectPath": "C:\\Users\\slloyd\\git\\ephemeris\\ephemeris.csproj",
-      "packagesPath": "C:\\Users\\slloyd\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\slloyd\\git\\ephemeris\\obj\\",
+      "projectPath": "C:\\Users\\Sam\\ephemeris\\ephemeris.csproj",
+      "packagesPath": "C:\\Users\\Sam\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\Sam\\ephemeris\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
       ],
       "configFilePaths": [
-        "C:\\Users\\slloyd\\AppData\\Roaming\\NuGet\\NuGet.Config"
+        "C:\\Users\\Sam\\AppData\\Roaming\\NuGet\\NuGet.Config"
       ],
       "originalTargetFrameworks": [
         "netcoreapp2.1"
