@@ -5,7 +5,7 @@ namespace ephemerisDraft
 {
     class Program
     {
-        static void Main(string[] args)
+        static void xMain(string[] args)
         {
             Block now = Block.readFile("0.2458400084722D+7");
             System.Console.WriteLine(Chebyshev.sum((float)now.tau(Timing.jd()), now.getRange(2, 14)));
