@@ -78,22 +78,19 @@ namespace ephemeris
         class Body
         {
             string name;
-            public class Position
+            class Coordinate
             {
-                double x;
-                double y;
-                double z;
+                double[] coordinate = new double[3];
                 Body relativeTo;
+                double x => this.coordinate[0];
+                double y => this.coordinate[1];
+                double z => this.coordinate[2];
             }
-            public class Velocity
-            {
-                double x;
-                double y;
-                double z;
-                Body relativeTo;
-            }
+            Coordinate position;
+            Coordinate velocity;
         }
     }
+
     static class fileReader
     {
         static IEnumerable<String> getLines(string path, int lineStart = 0, int lineEnd = -1)
