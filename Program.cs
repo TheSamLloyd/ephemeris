@@ -1,191 +1,108 @@
-﻿using System;
+using System;
 using System.IO;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace ephemeris
 {
-    class Program
+    public struct Body
     {
-        static void Main(string[] args)
+        string Name;
+
+        public string getName() => this.Name;
+        public Body(string Name)
         {
-            Ephemeris.ephFile eph = new Ephemeris.ephFile("ascp1950.430.txt", 2433264.5, 2469808.5);
-            eph.getBlock(2);
+            this.Name = Name;
+        }
+        public Coordinate getAbsolute(string time, Ephemeris eph)
+        {
+            return eph.calculatePos(this, eph.toJD(DateTime.Parse(time)));
         }
     }
-    class Ephemeris
+    public class Coordinate
     {
-        public static double toJD(DateTime dt = new DateTime())
+        public double x => Triple[0];
+        public double y => Triple[1];
+        public double z => Triple[2];
+
+        public double[] Triple = new double[3];
+
+        public Coordinate(double x, double y, double z)
         {
-            if (dt.Equals(new DateTime()))
-            {
-                dt = DateTime.UtcNow;
-            }
-            double unixEpoch = 2440587.5;
-            double jd = unixEpoch + (dt.Ticks - DateTime.UnixEpoch.Ticks) / (10_000_000.0) / (60 * 60 * 24.0);
-            return jd;
+            this.Triple = new double[3] { x, y, z };
         }
-        public static double parser(string toParse)
+        public Coordinate(double[] triple)
         {
-            string[] array = toParse.Split("D");
-            double output, mantissa;
-            short exponent;
-            if (array.Length != 2)
+            this.Triple = triple;
+        }
+
+        double[] get()
+        {
+            return this.Triple;
+        }
+
+    }
+    public static class Chebyshev
+    {
+        private static double N(int n, double x)
+        {
+            if (Math.Abs(x) <= 1)
             {
-                if (Double.TryParse(toParse, out output))
-                {
-                    return output;
-                }
-                else
-                {
-                    throw new Exception("array not right length....");
-                }
-            }
-            else if (Double.TryParse(array[0], out mantissa) && Int16.TryParse(array[1], out exponent))
-            {
-                return mantissa * Math.Pow(10.0, exponent);
+                return Math.Cos(n * Math.Acos(x));
             }
             else
             {
-                throw new Exception("Couldn't parse input....");
+                Console.WriteLine(x);
+                throw new ArgumentOutOfRangeException("x");
             }
         }
-
-        Body[] bodies = new Body[10] {
-                new Body("Mercury", 3, 14, 4),
-                new Body("Venus", 171, 10, 2),
-                new Body("Earth-Moon Barycenter", 231, 13, 2),
-                new Body("Mars", 309, 11),
-                new Body("Jupiter", 342, 8),
-                new Body("Saturn", 366, 7),
-                new Body("Uranus", 387, 6),
-                new Body("Neptune", 405, 6),
-                new Body("Pluto", 423, 6),
-                new Body("Moon", 441, 13, 8),
-
-            };
-        class Header
+        public static double[] sequence(double[] coefs, double x, int sections = 1)
         {
-            //need to figure out: which file to use, which block to take. We can... do that.
-
-        }
-        public class ephFile
-        {
-            double startTime, endTime;
-            string filename;
-            //some magic numbers here
-            int linesPerBlock = 341;
-            int numbersPerLine = 3;
-            int blocksPerFile = 1142;
-            int dimension = 3;
-
-            public ephFile(string filename, double startTime, double endTime)
+            int l = coefs.GetLength(0) / sections;
+            double[] output = new double[sections];
+            for (int k = 0; k < sections; k++)
             {
-                this.filename = filename;
-                this.startTime = startTime;
-                this.endTime = endTime;
-            }
-
-            public Block getBlock(int blockNumber)
-            {
-                double[] blockData = new double[341 * 3];
-                IEnumerable<string> rawData = fileReader.getLines(filename, blockNumber * linesPerBlock, linesPerBlock);
-                int i = 0;
-                foreach (string line in rawData)
+                double sum = 0;
+                for (int i = 0; i < l; i++)
                 {
-                    foreach (string entry in line.Split(" ", System.StringSplitOptions.RemoveEmptyEntries))
-                    {
-                        blockData[i] = Ephemeris.parser(entry);
-                        i++;
-                    }
+                    sum += coefs[k * l + i] * N(i, x);
                 }
-                return new Block(blockData);
+                output[k] = sum;
             }
-            public class Block
-            {
-                double[] data;
-                double startTime;
-                double endTime;
-                public Block(double[] data)
-                {
-                    this.data = data;
-                    this.startTime = data[0];
-                    this.endTime = data[1];
-                }
-                class Coefficients
-                {
-                    Coefficients(double[] coefs)
-                    {
-
-                    }
-                    public static class Chebyshev
-                    {
-                        private static double N(int n, double x)
-                        {
-                            if (Math.Abs(x) <= 1)
-                            {
-                                return Math.Cos(n * Math.Acos(x));
-                            }
-                            else
-                            {
-                                throw new ArgumentOutOfRangeException("x");
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        class Body
-        {
-            string name;
-            Body relativeTo;
-            public class Coordinate
-            {
-                double[] coordinate = new double[3];
-                public double x => this.coordinate[0];
-                public double y => this.coordinate[1];
-                public double z => this.coordinate[2];
-                public Coordinate(double x=0, double y=0, double z=0){
-                    this.coordinate = new double[3] {x,y,z};
-                }
-                public Coordinate(double[] coords){
-                    this.coordinate = coords;
-                }
-            }
-            Coordinate position;
-
-            public Coordinate getPosition(){
-                return this.position;
-            }
-            Coordinate velocity;
-            public Coordinate getVelocity(){
-                return this.velocity;
-            }
-            
-            public Body(string name, int StartPoint, int nCoefs, int nSets = 1)
-            {
-                this.name = name;
-
-            }
-            Coordinate correctRelative(Body satellite, Body primary)
-            {
-                double x,y,z;
-                x=satellite.getPosition().x-primary.getPosition().x;
-                y=satellite.getPosition().y-primary.getPosition().y;
-                z=satellite.getPosition().z-primary.getPosition().z;
-
-                return new Coordinate(x,y,z);
-            }
+            return output;
         }
     }
-
-    public static class fileReader
+    class Program
     {
-        public static IEnumerable<String> getLines(string path, int lineStart = 0, int count = 0)
+        static void Main()
         {
+            Ephemeris JPL430 = new Ephemeris(
+                new Object[10][]
+                    {
+                        new Object[] {"Mercury", 3, 14, 4},
+                        new Object[] {"Venus", 171,10,2},
+                        new Object[] {"Earth-Moon Barycenter", 231, 13, 2},
+                        new Object[] {"Mars", 309, 11, 1},
+                        new Object[] {"Jupiter", 342, 8, 1},
+                        new Object[] {"Saturn", 366, 7, 1},
+                        new Object[] {"Uranus", 387, 6, 1},
+                        new Object[] {"Neptune", 405, 6, 1},
+                        new Object[] {"Pluto", 423, 6,1},
+                        new Object[] {"Moon", 441, 13, 8}
 
-            return System.IO.File.ReadLines(path).Skip(lineStart).Take(count);
-
+                    },
+                new Object[][]
+                    {
+                        new Object[] {"ascp1950.430.txt", 2433264.5}
+                    }
+            );
+            Body Mars = new Body("Mars");
+            Body Venus = new Body("Venus");
+            string now = DateTime.UtcNow.ToString();
+            System.Console.WriteLine(now);
+            Coordinate mCo = Mars.getAbsolute(now, JPL430);
+            Coordinate eCo = JPL430.getEarth(now);
+            for (int i=0;i<3;i++){
+                Console.WriteLine(mCo.Triple[i]-eCo.Triple[i]);
+            }
         }
     }
 }
