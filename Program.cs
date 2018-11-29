@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.IO;
 
 namespace ephemeris
@@ -25,7 +25,7 @@ namespace ephemeris
 
         public double[] Triple = new double[3];
 
-        public Coordinate(double x, double y, double z)
+        public Coordinate(double x, double y, double z, string type="Rectangular")
         {
             this.Triple = new double[3] { x, y, z };
         }
@@ -75,7 +75,7 @@ namespace ephemeris
         static void Main()
         {
             Ephemeris JPL430 = new Ephemeris(
-                new Object[10][]
+                new Object[11][]
                     {
                         new Object[] {"Mercury", 3, 14, 4},
                         new Object[] {"Venus", 171,10,2},
@@ -86,7 +86,9 @@ namespace ephemeris
                         new Object[] {"Uranus", 387, 6, 1},
                         new Object[] {"Neptune", 405, 6, 1},
                         new Object[] {"Pluto", 423, 6,1},
-                        new Object[] {"Moon", 441, 13, 8}
+                        new Object[] {"Moon", 441, 13, 8},
+                        new Object[] {"Sun", 753, 11, 2},
+
 
                     },
                 new Object[][]
@@ -95,14 +97,29 @@ namespace ephemeris
                     }
             );
             Body Mars = new Body("Mars");
+            Body Sun = new Body("Sun");
             Body Venus = new Body("Venus");
-            string now = DateTime.UtcNow.ToString();
-            System.Console.WriteLine(now);
-            Coordinate mCo = Mars.getAbsolute(now, JPL430);
-            Coordinate eCo = JPL430.getEarth(now);
-            for (int i=0;i<3;i++){
-                Console.WriteLine(mCo.Triple[i]-eCo.Triple[i]);
+            DateTime Now = DateTime.UtcNow;
+            string now = Now.ToString();
+            System.Console.WriteLine(Now.ToString("u").Replace(" ","T"));
+            Coordinate Co = JPL430.geoSpherical(Sun, now);
+            for (int i = 0; i < 3; i++)
+            {
+                if (i<1){
+                    Console.WriteLine(Co.Triple[i]);
+                }
+                else
+                {
+                    Console.WriteLine(ToDegrees(Co.Triple[i]));
+                }
             }
+        }
+        public static double ToRadians(double deg){
+            return deg/180*Math.PI;
+        }
+        public static double ToDegrees(double deg)
+        {
+            return deg/Math.PI*180;
         }
     }
 }
