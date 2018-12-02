@@ -18,16 +18,15 @@ namespace ephemeris
             {
                 dt = DateTime.UtcNow;
             }
-            double L = 1.550505*Math.Pow(10,-8);
-            DateTime TAIEpoch = new DateTime(1977,1,1,0,0,0);
-            double jd =  ((dt.Ticks - TAIEpoch.Ticks) / (10_000_000.0) + 37) / (60 * 60 * 24.0);
-            jd = jd*(1+L);
-            jd+=2443144.5003725;
-            Console.WriteLine(jd);
+            double L = 1.550505 * Math.Pow(10, -8);
+            DateTime TAIEpoch = new DateTime(1977, 1, 1, 0, 0, 0);
+            double jd = ((dt.Ticks - TAIEpoch.Ticks) / (10_000_000.0) + 37) / (60 * 60 * 24.0);
+            jd = jd * (1 + L);
+            jd += 2443144.5003725;
             return jd;
         }
 
-        public Coordinate calculatePos(Body body, double jd)
+        public Coordinate[] calculatePos(Body body, double jd)
         {
             File ephFile = selectFile(jd);
             File.Block ephBlock = ephFile.getBlock(jd);
@@ -39,30 +38,34 @@ namespace ephemeris
             //so the range we need to take is: [startpos-1+numCoefs*dimension*set, numCoefs*dimension]
             double[] coefs = ephBlock.position((int)bodyInfo[1] - 1 + (int)bodyInfo[2] * (int)ephFile.dimension * (int)scaledTime[0], (int)bodyInfo[2] * ephFile.dimension);
             double[] position = Chebyshev.sequence(coefs, scaledTime[1], ephFile.dimension);
-            return new Coordinate(position);
+            double[] velocity = Chebyshev.Dsequence(coefs, scaledTime[1], ephFile.dimension);
+            return new Coordinate[2] { new Coordinate(position), new Coordinate(velocity) };
         }
 
-        public Coordinate getEarth(string JD)
+        public Coordinate[] getEarth(string JD)
         {
             Body barycenter = new Body("Earth-Moon Barycenter");
             Body moon = new Body("Moon");
             double jd = toJD(DateTime.Parse(JD));
-            double[] barycenterP = calculatePos(barycenter, jd).Triple;
-            double[] moonP = calculatePos(moon, jd).Triple;
-            double emRatio = 1 / 81.300569074190620;
+            Coordinate[] barycenterC = calculatePos(barycenter, jd);
+            Coordinate[] moonC = calculatePos(moon, jd);
+            double emRatio = 81.300569074190620;
             double[] earthCoord = new double[3];
-            for (int i = 0; i < moonP.Length; i++)
+            double[] earthVel = new double[3];
+            for (int i = 0; i < moonC[0].Triple.Length; i++)
             {
-                earthCoord[i] = (1 + emRatio) * barycenterP[i] - emRatio * moonP[i];
+                earthCoord[i] = barycenterC[0].Triple[i] - moonC[0].Triple[i] / (emRatio + 1);
+                earthVel[i] = barycenterC[1].Triple[i] - moonC[1].Triple[i] / (emRatio + 1);
+                Console.WriteLine(moonC[1].Triple[i]);
             }
-            return new Coordinate(earthCoord);
+            return new Coordinate[2] { new Coordinate(earthCoord), new Coordinate(earthVel) };
         }
 
         public Coordinate geoSpherical(Body body, string JD)
         {
-            Coordinate eCo = this.getEarth(JD);
+            Coordinate eCo = this.getEarth(JD)[0];
             double jd = toJD(DateTime.Parse(JD));
-            Coordinate bCo = this.calculatePos(body, jd);
+            Coordinate bCo = this.calculatePos(body, jd)[0];
             double[] bRelCo = new double[eCo.Triple.Length];
             for (int i = 0; i < bRelCo.Length; i++)
             {
@@ -79,7 +82,7 @@ namespace ephemeris
             }
             double theta(double[] co)
             {
-                return (Math.Atan2(co[1] , co[0]) + 2 * Math.PI) % (Math.PI * 2);
+                return (Math.Atan2(co[1], co[0]) + 2 * Math.PI) % (Math.PI * 2);
             }
             double phi(double[] co)
             {
@@ -88,6 +91,18 @@ namespace ephemeris
             return new Coordinate(rho(bRelCo), theta(bRelCo), phi(bRelCo), "Spherical");
         }
 
+        public Coordinate SphericalVel(Body body, string JD)
+        {
+            Coordinate[] earth = this.getEarth(JD);
+            double jd = toJD(DateTime.Parse(JD));
+            Coordinate[] absolute = calculatePos(body, jd);
+            Coordinate Pos = new Coordinate(absolute[0].x - earth[0].x, absolute[0].y - earth[0].y, absolute[0].z - earth[0].z);
+            Coordinate Vel = new Coordinate(absolute[1].x - earth[1].x, absolute[1].y - earth[1].y, absolute[1].z - earth[1].z);
+            double rhoD = (Pos.x * Vel.x + Pos.y * Vel.y + Pos.z * Vel.z) / Math.Sqrt(Math.Pow(Pos.x, 2) + Math.Pow(Pos.y, 2) + Math.Pow(Pos.z, 2));
+            double phiD = (-Pos.y * Vel.x + Pos.x * Vel.y) / (Math.Pow(Pos.x, 2) + Math.Pow(Pos.y, 2));
+            double thetaD = (Pos.z * (Pos.x * Vel.x + Pos.y * Vel.y) - (Pos.x * Pos.x + Pos.y * Pos.y) * Vel.z) / (Math.Sqrt(Pos.x * Pos.x + Pos.y * Pos.y) * (Pos.x * Pos.x + Pos.y * Pos.y + Pos.z * Pos.z));
+            return new Coordinate(rhoD, thetaD, phiD, "Spherical");
+        }
         File selectFile(double jd)
         {
             int whichTake = -1;
@@ -204,9 +219,10 @@ namespace ephemeris
             public int numbersPerLine = 3;
             public int blocksPerFile = 1142;
             public int dimension = 3;
+            public int daysPerBlock = 32;
             public Block getBlock(double jDate)
             {
-                int blockNumber = (int)Math.Ceiling((jDate - this.startTime) / 32);
+                int blockNumber = (int)Math.Ceiling((jDate - this.startTime) / daysPerBlock);
                 double[] blockData = new double[linesPerBlock * numbersPerLine];
                 IEnumerable<string> rawData = fileReader.getLines(filename, (blockNumber - 1) * linesPerBlock + 1, linesPerBlock);
                 int i = 0;

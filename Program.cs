@@ -12,9 +12,13 @@ namespace ephemeris
         {
             this.Name = Name;
         }
-        public Coordinate getAbsolute(string time, Ephemeris eph)
+        public Coordinate[] getAbsolute(string time, Ephemeris eph)
         {
             return eph.calculatePos(this, eph.toJD(DateTime.Parse(time)));
+        }
+        public Coordinate getSphericalVel(string time, Ephemeris eph)
+        {
+            return eph.SphericalVel(this, time);
         }
     }
     public class Coordinate
@@ -25,7 +29,7 @@ namespace ephemeris
 
         public double[] Triple = new double[3];
 
-        public Coordinate(double x, double y, double z, string type="Rectangular")
+        public Coordinate(double x, double y, double z, string type = "Rectangular")
         {
             this.Triple = new double[3] { x, y, z };
         }
@@ -54,6 +58,19 @@ namespace ephemeris
                 throw new ArgumentOutOfRangeException("x");
             }
         }
+
+        private static double deriv(int n, double x)
+        {
+            if (Math.Abs(x) <= 1)
+            {
+                return n * Math.Sin(n * Math.Acos(x)) / Math.Sqrt(1 - Math.Pow(x, 2));
+            }
+            else
+            {
+                Console.WriteLine(x);
+                throw new ArgumentOutOfRangeException("x");
+            }
+        }
         public static double[] sequence(double[] coefs, double x, int sections = 1)
         {
             int l = coefs.GetLength(0) / sections;
@@ -64,6 +81,21 @@ namespace ephemeris
                 for (int i = 0; i < l; i++)
                 {
                     sum += coefs[k * l + i] * N(i, x);
+                }
+                output[k] = sum;
+            }
+            return output;
+        }
+        public static double[] Dsequence(double[] coefs, double x, int sections = 1)
+        {
+            int l = coefs.GetLength(0) / sections;
+            double[] output = new double[sections];
+            for (int k = 0; k < sections; k++)
+            {
+                double sum = 0;
+                for (int i = 0; i < l; i++)
+                {
+                    sum += coefs[k * l + i] * deriv(i, x);
                 }
                 output[k] = sum;
             }
@@ -96,30 +128,56 @@ namespace ephemeris
                         new Object[] {"ascp1950.430.txt", 2433264.5}
                     }
             );
-            Body Mars = new Body("Mars");
-            Body Sun = new Body("Sun");
-            Body Venus = new Body("Venus");
+            Body[] bodies = new Body[] {
+            new Body("Mars"),
+            new Body("Sun"),
+            new Body("Venus"),
+            new Body("Pluto")
+            };
             DateTime Now = DateTime.UtcNow;
             string now = Now.ToString();
-            System.Console.WriteLine(Now.ToString("u").Replace(" ","T"));
-            Coordinate Co = JPL430.geoSpherical(Sun, now);
-            for (int i = 0; i < 3; i++)
+            System.Console.WriteLine(Now.ToString("u").Replace(" ", "T"));
+            Console.WriteLine(JPL430.toJD(DateTime.Parse(now)));
+            foreach (Body body in bodies)
             {
-                if (i<1){
-                    Console.WriteLine(Co.Triple[i]);
-                }
-                else
+                Console.WriteLine(body.getName());
+                Coordinate Co = JPL430.geoSpherical(body, now);
+                Coordinate vel = body.getSphericalVel(now,JPL430);
+                Console.WriteLine("Positions:");
+                for (int i = 0; i < 3; i++)
                 {
-                    Console.WriteLine(ToDegrees(Co.Triple[i]));
+                    Console.Write("\t");
+                    if (i < 1)
+                    {
+                        Console.WriteLine(Co.Triple[i]);
+                    }
+                    else
+                    {
+                        Console.WriteLine(ToDegrees(Co.Triple[i]));
+                    }
+                }
+                Console.WriteLine("Velocities (Sph):");
+                for (int i = 0; i < 3; i++)
+                {
+                    Console.Write("\t");
+                    if (i < 1)
+                    {
+                        Console.WriteLine(vel.Triple[i]);
+                    }
+                    else
+                    {
+                        Console.WriteLine(ToDegrees(vel.Triple[i]));
+                    }
                 }
             }
         }
-        public static double ToRadians(double deg){
-            return deg/180*Math.PI;
+        public static double ToRadians(double deg)
+        {
+            return deg / 180 * Math.PI;
         }
         public static double ToDegrees(double deg)
         {
-            return deg/Math.PI*180;
+            return deg / Math.PI * 180;
         }
     }
 }
