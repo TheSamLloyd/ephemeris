@@ -20,7 +20,7 @@ namespace ephemeris
             }
             double L = 1.550505 * Math.Pow(10, -8);
             DateTime TAIEpoch = new DateTime(1977, 1, 1, 0, 0, 0);
-            double jd = ((dt.Ticks - TAIEpoch.Ticks) / (10_000_000.0) + 37) / (60 * 60 * 24.0);
+            double jd = (dt.Ticks - TAIEpoch.Ticks) / (10_000_000.0) / (60 * 60 * 24.0);
             jd = jd * (1 + L);
             jd += 2443144.5003725;
             return jd;
@@ -56,7 +56,6 @@ namespace ephemeris
             {
                 earthCoord[i] = barycenterC[0].Triple[i] - moonC[0].Triple[i] / (emRatio + 1);
                 earthVel[i] = barycenterC[1].Triple[i] - moonC[1].Triple[i] / (emRatio + 1);
-                Console.WriteLine(moonC[1].Triple[i]);
             }
             return new Coordinate[2] { new Coordinate(earthCoord), new Coordinate(earthVel) };
         }
@@ -97,7 +96,7 @@ namespace ephemeris
             double jd = toJD(DateTime.Parse(JD));
             Coordinate[] absolute = calculatePos(body, jd);
             Coordinate Pos = new Coordinate(absolute[0].x - earth[0].x, absolute[0].y - earth[0].y, absolute[0].z - earth[0].z);
-            Coordinate Vel = new Coordinate(absolute[1].x - earth[1].x, absolute[1].y - earth[1].y, absolute[1].z - earth[1].z);
+            Coordinate Vel = new Coordinate((absolute[1].x - earth[1].x) / 86400, (absolute[1].y - earth[1].y) / 86400, (absolute[1].z - earth[1].z) / 86400);
             double rhoD = (Pos.x * Vel.x + Pos.y * Vel.y + Pos.z * Vel.z) / Math.Sqrt(Math.Pow(Pos.x, 2) + Math.Pow(Pos.y, 2) + Math.Pow(Pos.z, 2));
             double phiD = (-Pos.y * Vel.x + Pos.x * Vel.y) / (Math.Pow(Pos.x, 2) + Math.Pow(Pos.y, 2));
             double thetaD = (Pos.z * (Pos.x * Vel.x + Pos.y * Vel.y) - (Pos.x * Pos.x + Pos.y * Pos.y) * Vel.z) / (Math.Sqrt(Pos.x * Pos.x + Pos.y * Pos.y) * (Pos.x * Pos.x + Pos.y * Pos.y + Pos.z * Pos.z));
@@ -192,14 +191,8 @@ namespace ephemeris
 
             }
             Object[][] data, ephFiles;
-            public Object[] getBodyInfo(int index)
-            {
-                return data[index];
-            }
-            public Object[] getFileInfo(int index)
-            {
-                return ephFiles[index];
-            }
+            public Object[] getBodyInfo(int index) => data[index];
+            public Object[] getFileInfo(int index) => ephFiles[index];
             public int numFiles => ephFiles.GetLength(0);
             public int numBodies => data.GetLength(0);
         }

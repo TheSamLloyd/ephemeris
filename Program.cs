@@ -12,14 +12,9 @@ namespace ephemeris
         {
             this.Name = Name;
         }
-        public Coordinate[] getAbsolute(string time, Ephemeris eph)
-        {
-            return eph.calculatePos(this, eph.toJD(DateTime.Parse(time)));
-        }
-        public Coordinate getSphericalVel(string time, Ephemeris eph)
-        {
-            return eph.SphericalVel(this, time);
-        }
+        public Coordinate[] getAbsolute(string time, Ephemeris eph) => eph.calculatePos(this, eph.toJD(DateTime.Parse(time)));
+
+        public Coordinate getSphericalVel(string time, Ephemeris eph) => eph.SphericalVel(this, time);
     }
     public class Coordinate
     {
@@ -38,10 +33,7 @@ namespace ephemeris
             this.Triple = triple;
         }
 
-        double[] get()
-        {
-            return this.Triple;
-        }
+        double[] get() => this.Triple;
 
     }
     public static class Chebyshev
@@ -142,7 +134,7 @@ namespace ephemeris
             {
                 Console.WriteLine(body.getName());
                 Coordinate Co = JPL430.geoSpherical(body, now);
-                Coordinate vel = body.getSphericalVel(now,JPL430);
+                Coordinate vel = body.getSphericalVel(now, JPL430);
                 Console.WriteLine("Positions:");
                 for (int i = 0; i < 3; i++)
                 {
@@ -171,13 +163,8 @@ namespace ephemeris
                 }
             }
         }
-        public static double ToRadians(double deg)
-        {
-            return deg / 180 * Math.PI;
-        }
-        public static double ToDegrees(double deg)
-        {
-            return deg / Math.PI * 180;
-        }
+        public static double ToRadians(double deg) => deg / 180 * Math.PI;
+        public static double ToDegrees(double deg) => deg / Math.PI * 180;
+
     }
 }
