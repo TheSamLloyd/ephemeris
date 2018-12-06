@@ -126,7 +126,7 @@ namespace ephemeris
             else
             {
                 Object[] outFile = this.header.getFileInfo(whichTake);
-                return new File((string)outFile[0], (double)outFile[1]);
+                return new File("./ephFiles/" + (string)outFile[0], (double)outFile[1]);
             }
         }
         Object[] selectBody(string name)

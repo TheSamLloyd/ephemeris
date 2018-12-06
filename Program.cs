@@ -117,7 +117,9 @@ namespace ephemeris
                     },
                 new Object[][]
                     {
-                        new Object[] {"ascp1950.430.txt", 2433264.5}
+                        new Object[] {"ascp1950.430.txt", 2433264.5},
+                        new Object[] {"ascp2050.430.txt", 2469776.5},
+                        new Object[] {"ascp2150.430.txt", 2506320.5}
                     }
             );
             Body[] bodies = new Body[] {
