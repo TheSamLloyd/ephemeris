@@ -50,14 +50,9 @@ namespace ephemeris
             Coordinate[] barycenterC = calculatePos(barycenter, jd);
             Coordinate[] moonC = calculatePos(moon, jd);
             double emRatio = 81.300569074190620;
-            double[] earthCoord = new double[3];
-            double[] earthVel = new double[3];
-            for (int i = 0; i < moonC[0].Triple.Length; i++)
-            {
-                earthCoord[i] = barycenterC[0].Triple[i] - moonC[0].Triple[i] / (emRatio + 1);
-                earthVel[i] = barycenterC[1].Triple[i] - moonC[1].Triple[i] / (emRatio + 1);
-            }
-            return new Coordinate[2] { new Coordinate(earthCoord), new Coordinate(earthVel) };
+            Coordinate earthCoord = barycenterC[0] - moonC[0] / (emRatio + 1);
+            Coordinate earthVel = barycenterC[1] - moonC[1] / (emRatio + 1);
+            return new Coordinate[2] { earthCoord, earthVel };
         }
 
         public Coordinate geoSpherical(Body body, string JD)
@@ -65,11 +60,7 @@ namespace ephemeris
             Coordinate eCo = this.getEarth(JD)[0];
             double jd = toJD(DateTime.Parse(JD));
             Coordinate bCo = this.calculatePos(body, jd)[0];
-            double[] bRelCo = new double[eCo.Triple.Length];
-            for (int i = 0; i < bRelCo.Length; i++)
-            {
-                bRelCo[i] = bCo.Triple[i] - eCo.Triple[i];
-            }
+            Coordinate bRelCo = bCo - eCo;
             double rho(double[] co)
             {
                 double d = 0;
@@ -87,7 +78,7 @@ namespace ephemeris
             {
                 return Math.PI / 2 - Math.Acos(co[2] / rho(co));
             }
-            return new Coordinate(rho(bRelCo), theta(bRelCo), phi(bRelCo), "Spherical");
+            return new Coordinate(rho(bRelCo.Triple), theta(bRelCo.Triple), phi(bRelCo.Triple), "Spherical");
         }
 
         public Coordinate SphericalVel(Body body, string JD)
@@ -95,8 +86,8 @@ namespace ephemeris
             Coordinate[] earth = this.getEarth(JD);
             double jd = toJD(DateTime.Parse(JD));
             Coordinate[] absolute = calculatePos(body, jd);
-            Coordinate Pos = new Coordinate(absolute[0].x - earth[0].x, absolute[0].y - earth[0].y, absolute[0].z - earth[0].z);
-            Coordinate Vel = new Coordinate((absolute[1].x - earth[1].x) / 86400, (absolute[1].y - earth[1].y) / 86400, (absolute[1].z - earth[1].z) / 86400);
+            Coordinate Pos = absolute[0] - earth[0];
+            Coordinate Vel = (absolute[1] - earth[1]) / 86400;
             double rhoD = (Pos.x * Vel.x + Pos.y * Vel.y + Pos.z * Vel.z) / Math.Sqrt(Math.Pow(Pos.x, 2) + Math.Pow(Pos.y, 2) + Math.Pow(Pos.z, 2));
             double phiD = (-Pos.y * Vel.x + Pos.x * Vel.y) / (Math.Pow(Pos.x, 2) + Math.Pow(Pos.y, 2));
             double thetaD = (Pos.z * (Pos.x * Vel.x + Pos.y * Vel.y) - (Pos.x * Pos.x + Pos.y * Pos.y) * Vel.z) / (Math.Sqrt(Pos.x * Pos.x + Pos.y * Pos.y) * (Pos.x * Pos.x + Pos.y * Pos.y + Pos.z * Pos.z));
@@ -150,29 +141,9 @@ namespace ephemeris
         }
         public static double parser(string toParse)
         {
-            string[] array = toParse.Split("D");
-            double output, mantissa;
-            short exponent;
-            if (array.Length != 2)
-            {
-                if (Double.TryParse(toParse, out output))
-                {
-                    return output;
-                }
-                else
-                {
-                    throw new Exception("array not right length....");
-                }
-            }
-            else if (Double.TryParse(array[0], out mantissa) && Int16.TryParse(array[1], out exponent))
-            {
-                return mantissa * Math.Pow(10.0, exponent);
-            }
-            else
-            {
-                throw new Exception("Couldn't parse input....");
-            }
+            return Double.Parse(toParse.Replace("D", "E"), System.Globalization.NumberStyles.Float);
         }
+
         public static class fileReader
         {
             public static IEnumerable<String> getLines(string path, int lineStart = 0, int count = 0)

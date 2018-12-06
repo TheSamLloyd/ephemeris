@@ -35,6 +35,61 @@ namespace ephemeris
 
         double[] get() => this.Triple;
 
+        public static Coordinate operator +(Coordinate a, Coordinate b)
+        {
+            double[] k = new double[3];
+            for (int i = 0; i < 3; i++)
+            {
+                k[i] = a.Triple[i] + b.Triple[i];
+            }
+            return new Coordinate(k);
+        }
+        public static Coordinate operator -(Coordinate a, Coordinate b)
+        {
+            double[] k = new double[3];
+            for (int i = 0; i < 3; i++)
+            {
+                k[i] = a.Triple[i] - b.Triple[i];
+            }
+            return new Coordinate(k);
+        }
+        public static Coordinate operator *(Coordinate a, Coordinate b)
+        {
+            double[] k = new double[3];
+            for (int i = 0; i < 3; i++)
+            {
+                k[i] = a.Triple[i] * b.Triple[i];
+            }
+            return new Coordinate(k);
+        }
+        public static Coordinate operator *(Coordinate a, double b)
+        {
+            double[] k = new double[3];
+            for (int i = 0; i < 3; i++)
+            {
+                k[i] = a.Triple[i] * b;
+            }
+            return new Coordinate(k);
+        }
+        public static Coordinate operator /(Coordinate a, Coordinate b)
+        {
+            double[] k = new double[3];
+            for (int i = 0; i < 3; i++)
+            {
+                k[i] = a.Triple[i] / b.Triple[i];
+            }
+            return new Coordinate(k);
+        }
+        public static Coordinate operator /(Coordinate a, double b)
+        {
+            double[] k = new double[3];
+            for (int i = 0; i < 3; i++)
+            {
+                k[i] = a.Triple[i] / b;
+            }
+            return new Coordinate(k);
+        }
+
     }
     public static class Chebyshev
     {
