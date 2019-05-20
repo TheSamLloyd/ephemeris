@@ -178,10 +178,11 @@ namespace ephemeris
                     }
             );
             Body[] bodies = new Body[] {
-            new Body("Mars"),
             new Body("Sun"),
             new Body("Venus"),
-            new Body("Pluto")
+            new Body("Mars"),
+            new Body("Pluto"),
+            new Body("Moon")
             };
             DateTime Now = DateTime.UtcNow;
             string now = Now.ToString();

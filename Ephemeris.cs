@@ -19,7 +19,7 @@ namespace ephemeris
                 dt = DateTime.UtcNow;
             }
             double L = 1.550505 * Math.Pow(10, -8);
-            DateTime TAIEpoch = new DateTime(1977, 1, 1, 0, 0, 0);
+            DateTime TAIEpoch = new DateTime(1976, 12, 31, 23, 59, 23);
             double jd = (dt.Ticks - TAIEpoch.Ticks) / (10_000_000.0) / (60 * 60 * 24.0);
             jd = jd * (1 + L);
             jd += 2443144.5003725;
@@ -61,6 +61,7 @@ namespace ephemeris
             double jd = toJD(DateTime.Parse(JD));
             Coordinate bCo = this.calculatePos(body, jd)[0];
             Coordinate bRelCo = bCo - eCo;
+            if (body.getName()=="Moon") bRelCo=bCo;
             double rho(double[] co)
             {
                 double d = 0;

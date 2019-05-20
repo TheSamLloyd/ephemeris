@@ -3300,11 +3300,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "c:\\Users\\slloyd\\git\\ephemeris\\ephemeris.csproj",
+      "projectUniqueName": "C:\\Users\\slloyd\\git\\ephemeris\\ephemeris.csproj",
       "projectName": "ephemeris",
-      "projectPath": "c:\\Users\\slloyd\\git\\ephemeris\\ephemeris.csproj",
+      "projectPath": "C:\\Users\\slloyd\\git\\ephemeris\\ephemeris.csproj",
       "packagesPath": "C:\\Users\\slloyd\\.nuget\\packages\\",
-      "outputPath": "c:\\Users\\slloyd\\git\\ephemeris\\obj\\",
+      "outputPath": "C:\\Users\\slloyd\\git\\ephemeris\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
