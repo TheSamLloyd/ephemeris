@@ -182,41 +182,29 @@ namespace ephemeris
             new Body("Venus"),
             new Body("Mars"),
             new Body("Pluto"),
-            new Body("Moon")
+            new Body("Moon"),
+            new Body("Mercury"),
+            new Body("Saturn"),
+            new Body("Uranus"),
+            new Body("Neptune"),
+            new Body("Jupiter")
             };
+            Transits transits = new Transits(2,true);
+            string Natal = DateTime.Parse("1993-11-30T21:30:00Z").ToString();
             DateTime Now = DateTime.UtcNow;
             string now = Now.ToString();
             System.Console.WriteLine(Now.ToString("u").Replace(" ", "T"));
             Console.WriteLine(JPL430.toJD(DateTime.Parse(now)));
             foreach (Body body in bodies)
             {
-                Console.WriteLine(body.getName());
                 Coordinate Co = JPL430.geoSpherical(body, now);
-                Coordinate vel = body.getSphericalVel(now, JPL430);
-                Console.WriteLine("Positions:");
-                for (int i = 0; i < 3; i++)
+                foreach (Body natalBody in bodies)
                 {
-                    Console.Write("\t");
-                    if (i < 1)
+                    Coordinate NatalCo = JPL430.geoSpherical(natalBody, Natal);
+                    Transits.Transit transit = transits.classify(Math.Abs(AngleDifference(ToDegrees(Co.y), ToDegrees(NatalCo.y))));
+                    if (transit.getName() != "")
                     {
-                        Console.WriteLine(Co.Triple[i]);
-                    }
-                    else
-                    {
-                        Console.WriteLine(ToDegrees(Co.Triple[i]));
-                    }
-                }
-                Console.WriteLine("Velocities (Sph):");
-                for (int i = 0; i < 3; i++)
-                {
-                    Console.Write("\t");
-                    if (i < 1)
-                    {
-                        Console.WriteLine(vel.Triple[i]);
-                    }
-                    else
-                    {
-                        Console.WriteLine(ToDegrees(vel.Triple[i]));
+                        Console.WriteLine(body.getName()+ "\t"+transit.getName()+"\t" + natalBody.getName()+"\t"+transit.getOrb());
                     }
                 }
             }
@@ -224,5 +212,13 @@ namespace ephemeris
         public static double ToRadians(double deg) => deg / 180 * Math.PI;
         public static double ToDegrees(double deg) => deg / Math.PI * 180;
 
+        public static double AngleDifference(double angle1, double angle2, Boolean degrees=true){
+            if (degrees){
+                return Math.Min(angle1 - angle2, 360 - (angle1 - angle2));
+            }
+            else{
+                return Math.Min(angle1 - angle2, 2*Math.PI - (angle1 - angle2));
+            }
+        }
     }
 }
