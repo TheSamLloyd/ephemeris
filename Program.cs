@@ -35,6 +35,18 @@ namespace ephemeris
 
         double[] get() => this.Triple;
 
+        public Coordinate toSpherical(){
+            double rho = Math.Sqrt(Math.Pow(this.x,2)+Math.Pow(this.y,2)+Math.Pow(this.z,2));
+            double theta = (Math.Atan2(this.y, this.x) + 2 * Math.PI) % (Math.PI * 2);
+            double phi = (Math.PI / 2 - Math.Acos(this.z / rho));
+            return new Coordinate(rho, theta, phi, "Spherical");
+        }
+        public Coordinate toRectangular(){
+            double x = this.x*Math.Sin(this.y)*Math.Cos(this.z);
+            double y = this.x*Math.Sin(this.y)*Math.Sin(this.z);
+            double z = this.x*Math.Cos(this.y);
+            return new Coordinate(x, y, z);
+        }
         public static Coordinate operator +(Coordinate a, Coordinate b)
         {
             double[] k = new double[3];
