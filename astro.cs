@@ -4,15 +4,17 @@ namespace ephemeris
     public class Transits
     {
         double orb;
-        public Transits(double orb, Boolean degrees = true)
+        Ephemeris eph;
+        public Transits(Ephemeris eph, double orb, Boolean degrees = true)
         {
+            this.eph = eph;
             if (degrees)
             {
                 this.orb = orb;
             }
             else
             {
-                this.orb = Program.ToDegrees(orb);
+                this.orb = Angle.ToDegrees(orb);
             }
         }
         public class Transit
@@ -21,12 +23,14 @@ namespace ephemeris
             double orb;
             string name;
             Boolean degrees;
-            public Transit(string name, double angle, double orb, Boolean degrees = true)
+            double duration;
+            public Transit(string name, double angle, double orb, Boolean degrees = true, double duration = 0)
             {
                 this.angle = angle;
                 this.orb = orb;
                 this.name = name;
                 this.degrees = degrees;
+                this.duration = duration;
             }
             public string getName()
             {
@@ -49,17 +53,14 @@ namespace ephemeris
             new Transit("Oppose",180,2),
         };
 
-        public Transit classify(double angle, Boolean degrees = true)
-        {
-            foreach (Transit type in types)
-            {
-                if (angle >= Math.Abs(type.getAngle() - type.getOrb()) && angle <= type.getAngle() + type.getOrb())
-                {
-                    return new Transit(type.getName(), angle, Math.Abs(angle - type.getAngle()));
-                }
-            }
-            return new Transit("", 0, 0);
-        }
+        // public Transit classify(Body current, Body natal, Boolean duration = false)
+        // {
+        //     double difference = eph.geoSpherical(current) - natal.y;
+        //     foreach (Transit type in types)
+        //     {
+
+        //     }
+        // }
 
     };
 
