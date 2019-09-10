@@ -8,15 +8,13 @@ namespace ephemeris
         static void Main()
         {
             Ephemeris ephemeris = Ephemeris.JPL430;
-            DateTime Natal = DateTime.Parse("1993-11-30T21:30:00Z");
-            DateTime Now = DateTime.UtcNow;
-            System.Console.WriteLine(Now.ToString("u").Replace(" ", "T"));
-            Console.WriteLine(ephemeris.toJD(Now));
-            Body[] bodies = ephemeris.getBodies();
-            foreach (Body body in bodies)
+            DateTime Natal = DateTime.Parse("1993-11-30T21:30:00Z").ToUniversalTime();
+            System.Console.WriteLine(Natal.ToString("u").Replace(" ", "T"));
+            Console.WriteLine(Ephemeris.toJD());
+            foreach (Body body in ephemeris.getBodies())
             {
                 Console.WriteLine(
-                body.getName() + ": " + Angle.ToDegrees(ephemeris.geoSpherical(body, Natal).theta.Measure()));
+                body.getName() + ": " + Math.Round(Angle.ToDegrees(body.getSpherical(Natal, ephemeris).theta.Measure()), 3));
             }
         }
     }

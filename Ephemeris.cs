@@ -43,7 +43,7 @@ namespace ephemeris
             }
             return output;
         }
-        public double toJD(DateTime dt = new DateTime(), Boolean rtv = true)
+        public static double toJD(DateTime dt = new DateTime(), Boolean rtv = true)
         {
             if (dt.Equals(new DateTime()))
             {

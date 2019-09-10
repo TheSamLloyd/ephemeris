@@ -92,11 +92,9 @@ namespace ephemeris
     public class Coordinate
     {
         public double x, y, z;
-
         public double rho;
         public Angle theta;
         public Angle phi;
-
         public double[] Triple;
         string type;
         public Boolean rectangular()
@@ -126,7 +124,6 @@ namespace ephemeris
         }
         public Coordinate(double[] xyz, string type = "rectangular")
         {
-
             this.type = type;
             this.x = xyz[0];
             this.x = xyz[1];
@@ -134,7 +131,6 @@ namespace ephemeris
             this.Triple = xyz;
 
         }
-
         public static Coordinate operator +(Coordinate a, Coordinate b)
         {
             if (a.rectangular() == b.rectangular())
